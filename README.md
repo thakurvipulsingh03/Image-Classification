@@ -11,7 +11,8 @@ A Flask-based web application that allows users to upload an image and uses a pr
 
 ## Screenshot
 
-[Add a screenshot of the application here after running it]
+![image (2)](https://github.com/user-attachments/assets/be7c1164-0230-4e1c-b51a-61fefe61ed04)
+
 
 ## Setup and Installation
 
