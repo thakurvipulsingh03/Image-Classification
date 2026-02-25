@@ -1,8 +1,8 @@
 from flask import Flask, request, render_template, redirect, url_for
-import tflite_runtime.interpreter as tflite
+import requests
+import base64
 from PIL import Image
-import numpy as np
-import urllib.request
+import io
 import os
 
 app = Flask(__name__)
@@ -66,20 +66,11 @@ def predict():
         return redirect(url_for('index'))
     
     try:
-        # Process image in memory
-        img = Image.open(file.stream)
-        img_array = preprocess_image(img)
-        preds = predict_image(img_array)
-        decoded_preds = decode_predictions(preds, top=3)
+        # Read image data
+        image_data = file.read()
         
-        # Get top predictions
-        predictions = []
-        for i, (imagenet_id, label, score) in enumerate(decoded_preds):
-            predictions.append({
-                'rank': i + 1,
-                'label': label,
-                'confidence': f"{score * 100:.2f}%"
-            })
+        # Classify using Clarifai API
+        predictions = classify_image_with_clarifai(image_data)
         
         return render_template('index.html', predictions=predictions)
     
