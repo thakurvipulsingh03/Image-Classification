@@ -3,12 +3,8 @@ from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input, decode_predictions
 from tensorflow.keras.preprocessing import image
 import numpy as np
-import os
 
 app = Flask(__name__)
-
-# Create necessary directories if they don't exist
-os.makedirs('static/uploads', exist_ok=True)
 
 # Load the pretrained model
 model = MobileNetV2(weights='imagenet')
@@ -26,13 +22,9 @@ def predict():
     if file.filename == '':
         return redirect(url_for('index'))
     
-    # Save the uploaded image
-    img_path = os.path.join('static/uploads', file.filename)
-    file.save(img_path)
-
     try:
-        # Preprocess the image
-        img = image.load_img(img_path, target_size=(224, 224))
+        # Process image in memory without saving
+        img = image.load_img(file.stream, target_size=(224, 224))
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
         img_array = preprocess_input(img_array)
@@ -50,7 +42,8 @@ def predict():
                 'confidence': f"{score * 100:.2f}%"
             })
         
-        return render_template('index.html', predictions=predictions, image_file=file.filename)
+        # Since no file saved, pass a placeholder or remove image display
+        return render_template('index.html', predictions=predictions)
     
     except Exception as e:
         return render_template('index.html', error=str(e))
